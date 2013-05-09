@@ -1,5 +1,6 @@
 require "kent/version"
+require "kent/configuration"
 
 module Kent
-  # Your code goes here...
+  include Configuration
 end
