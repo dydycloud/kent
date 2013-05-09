@@ -3,10 +3,17 @@ require 'spec_helper'
 describe "configuration" do
 
   it "should be able to configure redis" do
-    Kent.configure do |config|
-      config.redis = 123
-    end
+    Kent.configure { |c| c.redis = :redis }
+    Kent.redis.should eq :redis
+  end
 
-    Kent.redis.should eq 123
+  it "should be able to configure id generator" do
+    Kent.configure { |c| c.id_generator = :id_generator }
+    Kent.id_generator.should eq :id_generator
+  end
+
+  it "set id generate to UUID if it's blank" do
+    Kent.configure { |c| c.id_generator = nil }
+    Kent.id_generator.should eq UUID
   end
 end
