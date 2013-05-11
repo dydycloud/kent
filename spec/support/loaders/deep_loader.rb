@@ -18,3 +18,13 @@ class DeepLoaderWithTemplateOverride < TestLoader
   end
 
 end
+
+class VeryDeepLoader < DeepLoaderWithRenderOverride
+
+  attr_accessor :very_deep_field
+
+  before_render do
+    self.very_deep_field = :very_deep_field
+  end
+
+end

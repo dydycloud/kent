@@ -68,5 +68,17 @@ describe Kent::Loader do
       end
     end
 
+    context "VeryDeepLoader" do
+
+      let(:loader) { VeryDeepLoader.new }
+
+      it "should run callbacks of all ancestors" do
+        loader.run_before_render_hooks
+        loader.field.should eq :test_loader
+        loader.deep_field.should eq :deep_loader
+        loader.very_deep_field.should eq :very_deep_field
+      end
+    end
+
   end
 end
