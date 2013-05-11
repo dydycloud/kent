@@ -4,3 +4,4 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'uuid'
+gem 'json', '~> 1.7.7'
