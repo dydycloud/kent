@@ -5,6 +5,11 @@ describe Kent::AsyncSender do
   let(:worker) { described_class }
   let(:loader) { RealLoader }
   let(:loader_instance) { stub(:loaderInstance) }
+  let(:generated_id) { stub(:generatedId) }
+
+  before do
+    Kent.configure { |c| c.faye_host = "localhost"; c.faye_port = 80; }
+  end
 
   it "should take jobs from configured queue" do
     worker.queue.should eq :kent_sender
@@ -16,5 +21,9 @@ describe Kent::AsyncSender do
     worker.template(loader)
   end
 
-  it "should send it to Faye server"
+  it "should send it to Faye server" do
+    worker.stub(:template => :template, :sender => stub(:Sender))
+    worker.sender.should_receive(:publish).with("/#{generated_id}", :template)
+    worker.perform(loader, generated_id)
+  end
 end

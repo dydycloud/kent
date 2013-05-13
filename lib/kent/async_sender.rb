@@ -12,11 +12,15 @@ module Kent
     end
 
     def self.perform(loader, generated_id)
-
+      sender.publish("/#{generated_id}", template)
     end
 
     def self.template(loader)
       loader.new.render_template
+    end
+
+    def self.sender
+      Kent::Faye.new
     end
 
   end
