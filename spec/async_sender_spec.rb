@@ -21,6 +21,10 @@ describe Kent::AsyncSender do
     worker.template(loader)
   end
 
+  it "should use Kent::Faye as sender" do
+    worker.sender.should be_instance_of Kent::Faye
+  end
+
   it "should send it to Faye server" do
     worker.stub(:template => :template, :sender => stub(:Sender))
     worker.sender.should_receive(:publish).with("/#{generated_id}", :template)
