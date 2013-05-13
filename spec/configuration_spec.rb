@@ -16,4 +16,9 @@ describe "configuration" do
     Kent.configure { |c| c.id_generator = nil }
     Kent.id_generator.should eq UUID
   end
+
+  it "set redis instance if it's blank" do
+    Kent.configure { |c| c.redis = nil }
+    Kent.redis.should be_instance_of Redis
+  end
 end

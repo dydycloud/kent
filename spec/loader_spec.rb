@@ -81,4 +81,15 @@ describe Kent::Loader do
     end
 
   end
+
+  context "#render" do
+
+    let(:loader) { RealLoader.new }
+
+    it "should render template" do
+      loader.rendering_controller.append_view_path File.join(GEM_ROOT, "spec", "support", "templates")
+      loader.render_template.should eq "<div>\n  a = b\n</div>"
+    end
+  end
+
 end

@@ -5,3 +5,5 @@ gemspec
 
 gem 'uuid'
 gem 'json', '~> 1.7.7'
+gem 'redis'
+gem 'render_anywhere'

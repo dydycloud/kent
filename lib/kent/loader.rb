@@ -4,20 +4,41 @@ require 'kent/loaders/hooks'
 module Kent
   class Loader
     attr_reader :params
+    attr_reader :need_to_run_hooks
+
+    include ::RenderAnywhere
+
 
     def initialize(params = {})
       @params = params
-    end
-
-    def render
-      run_before_render_hooks
+      @need_to_run_hooks = true
     end
 
     def run_before_render_hooks
-      self.class.before_render_procs.each do |p|
-        instance_eval(&p)
+      if @need_to_run_hooks
+        self.class.before_render_procs.each do |p|
+          instance_eval(&p)
+        end
+        @need_to_run_hooks = false
       end
     end
+
+    def render_template
+      run_before_render_hooks
+      render :template => template_path, :layout => false
+    end
+
+    def template_path
+      self.class.template_path
+    end
+
+    # def render(*args)
+    #   rendering_controller.render_to_string(*args)
+    # end
+
+    # def rendering_controller
+    #   @rendering_controller ||= RenderAnywhere::RenderingController.new
+    # end
 
     class << self
       include Loaders::Template

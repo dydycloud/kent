@@ -9,6 +9,14 @@ module Kent
           @id_generator ||= UUID
         end
 
+        def redis
+          @redis ||= Redis.new
+        end
+
+        def resque_queue
+          @resque_queue ||= :kent_sender
+        end
+
         def configure
           yield self
         end
