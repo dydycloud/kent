@@ -21,4 +21,14 @@ describe "configuration" do
     Kent.configure { |c| c.redis = nil }
     Kent.redis.should be_instance_of Redis
   end
+
+  it "should be able to configure resque queue" do
+    Kent.configure { |c| c.resque_queue = :test_queue }
+    Kent.resque_queue.should eq :test_queue
+  end
+
+  it "should set :kent_sender as default resque queue" do
+    Kent.resque_queue = nil
+    Kent.resque_queue.should eq :kent_sender
+  end
 end

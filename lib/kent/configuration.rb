@@ -3,7 +3,7 @@ module Kent
 
     def self.included(klass)
       class << klass
-        attr_accessor :redis, :id_generator, :faye_host, :faye_port
+        attr_accessor :redis, :id_generator, :faye_host, :faye_port, :resque_queue
 
         def id_generator
           @id_generator ||= UUID

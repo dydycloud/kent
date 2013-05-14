@@ -23,4 +23,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rails"
   gem.add_development_dependency "resque"
   gem.add_dependency "render_anywhere"
+  gem.add_dependency "uuid"
+  gem.add_dependency "redis"
 end
