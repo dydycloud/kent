@@ -1,0 +1,23 @@
+Kent.configure do |config|
+
+  # Class for id generation, should respond to 'generate' method.
+  #
+  config.id_generator = UUID
+
+  # Redis instance.
+  #
+  config.redis = Redis.new
+
+  # Resque queue.
+  #
+  config.resque_queue = :kent_queue
+
+  # Faye host.
+  #
+  config.faye_host = "localhost"
+
+  # Faye port
+  #
+  config.faye_port = 9292
+
+end

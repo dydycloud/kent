@@ -6,8 +6,6 @@ module Kent
     attr_reader :params
     attr_reader :need_to_run_hooks
 
-    include ::RenderAnywhere
-
 
     def initialize(params = {})
       @params = params
@@ -46,4 +44,13 @@ module Kent
     end
 
   end
+end
+
+ActiveSupport.on_load(:before_configuration) do
+  unless defined? ApplicationHelper
+    module ApplicationHelper
+    end
+  end
+  require "render_anywhere"
+  Kent::Loader.send(:include, RenderAnywhere)
 end
