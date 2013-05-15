@@ -12,7 +12,8 @@ describe Kent::AsyncSender do
   end
 
   it "should take jobs from configured queue" do
-    worker.queue.should eq :kent_sender
+    worker.queue = nil
+    worker.queue.should eq Kent.resque_queue
   end
 
   it "should render template" do
@@ -28,6 +29,6 @@ describe Kent::AsyncSender do
   it "should send it to Faye server" do
     worker.stub(:template => :template, :sender => stub(:Sender))
     worker.sender.should_receive(:publish).with("/#{generated_id}", :template)
-    worker.perform(loader, generated_id)
+    worker.perform(loader.name, generated_id)
   end
 end

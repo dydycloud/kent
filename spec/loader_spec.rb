@@ -12,7 +12,7 @@ describe Kent::Loader do
 
     it "should be able to configure before render block" do
       loader.run_before_render_hooks
-      loader.field.should eq :test_loader
+      loader.rendering_controller.field.should eq :test_loader
     end
 
     it "should be able to configure template path" do
@@ -42,7 +42,7 @@ describe Kent::Loader do
 
       it "should call before render block from parent" do
         loader.run_before_render_hooks
-        loader.field.should eq :test_loader
+        loader.rendering_controller.field.should eq :test_loader
       end
 
     end
@@ -57,8 +57,8 @@ describe Kent::Loader do
 
       it "should call before render block from parent + its own callback" do
         loader.run_before_render_hooks
-        loader.field.should eq :test_loader
-        loader.deep_field.should eq :deep_loader
+        loader.rendering_controller.field.should eq :test_loader
+        loader.rendering_controller.deep_field.should eq :deep_loader
       end
     end
 
@@ -71,12 +71,13 @@ describe Kent::Loader do
     context "VeryDeepLoader" do
 
       let(:loader) { VeryDeepLoader.new }
+      let(:controller) { loader.rendering_controller }
 
       it "should run callbacks of all ancestors" do
         loader.run_before_render_hooks
-        loader.field.should eq :test_loader
-        loader.deep_field.should eq :deep_loader
-        loader.very_deep_field.should eq :very_deep_field
+        controller.field.should eq :test_loader
+        controller.deep_field.should eq :deep_loader
+        controller.very_deep_field.should eq :very_deep_field
       end
     end
 

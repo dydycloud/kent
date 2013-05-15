@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "simplecov"
   gem.add_development_dependency "rails"
   gem.add_development_dependency "resque"
-  gem.add_dependency "render_anywhere"
-  gem.add_dependency "uuid"
-  gem.add_dependency "redis"
+  gem.add_runtime_dependency "render_anywhere"
+  gem.add_runtime_dependency "uuid"
+  gem.add_runtime_dependency "redis"
 end

@@ -11,8 +11,9 @@ module Kent
       end
     end
 
-    def self.perform(loader, generated_id)
-      sender.publish("/#{generated_id}", template)
+    def self.perform(loader_name, generated_id)
+      loader = loader_name.constantize
+      sender.publish("/#{generated_id}", template(loader))
     end
 
     def self.template(loader)

@@ -15,7 +15,7 @@ module Kent
     def run_before_render_hooks
       if @need_to_run_hooks
         self.class.before_render_procs.each do |p|
-          instance_eval(&p)
+          rendering_controller.instance_eval(&p)
         end
         @need_to_run_hooks = false
       end

@@ -1,7 +1,7 @@
 class TestLoader < Kent::Loader
-  attr_accessor :field
 
   before_render do
+    self.class.instance_eval { attr_accessor :field }
     self.field = :test_loader
   end
 

@@ -6,11 +6,11 @@ module Kent
 
       register_async_loading(loader, subscription_id)
 
-      "<script type='text/javascript'>subscribe_to_async_load('#{subscription_id}')</script>".html_safe
+      "<script id='#{subscription_id}' type='text/javascript'>subscribe_to_async_load('#{subscription_id}')</script>".html_safe
     end
 
     def register_async_loading(loader, subscription_id)
-      Resque.enqueue(kent_worker, loader, subscription_id)
+      ::Resque.enqueue(kent_worker, loader.name, subscription_id)
     end
 
     def kent_worker
@@ -18,4 +18,8 @@ module Kent
     end
 
   end
+end
+
+ActiveSupport.on_load :action_view do
+  ActionView::Base.send(:include, Kent::ViewHelpers)
 end
