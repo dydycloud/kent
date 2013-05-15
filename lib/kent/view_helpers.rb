@@ -1,12 +1,17 @@
 module Kent
   module ViewHelpers
 
-    def async_load(loader)
-      subscription_id = ::Kent.id_generator.generate
+    def async_load(loader, options = {}, &block)
+      options.symbolize_keys!
+
+      subscription_id = options[:subscription_id] || ::Kent.id_generator.generate
+      klass = Array(options[:class]) + ["kent-container"]
+      style = { :display => "none" }.merge(options[:style] || {})
+      str_style = style.map { |k,v| "#{k}:#{v}" }.join("; ")
 
       register_async_loading(loader, subscription_id)
 
-      "<script id='#{subscription_id}' type='text/javascript'>subscribe_to_async_load('#{subscription_id}')</script>".html_safe
+      "<span id='#{subscription_id}' class='#{klass.join(" ")}' style='#{str_style};'>#{capture(&block) if block_given?}</span>".html_safe
     end
 
     def register_async_loading(loader, subscription_id)

@@ -6,7 +6,6 @@ module Kent
     attr_reader :params
     attr_reader :need_to_run_hooks
 
-
     def initialize(params = {})
       @params = params
       @need_to_run_hooks = true

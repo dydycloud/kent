@@ -1,5 +1,10 @@
-require 'coveralls'
-Coveralls.wear!
+if ENV["LOCAL"]
+  require 'simplecov'
+  SimpleCov.start
+else
+  require 'coveralls'
+  Coveralls.wear!
+end
 
 require 'rails/all'
 

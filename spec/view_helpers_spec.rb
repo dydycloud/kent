@@ -20,7 +20,7 @@ describe Kent::ViewHelpers do
 
   context "#async_load" do
     it "should return valid piece of js" do
-      view_helper.async_load(BlankLoader).should eq "<script id='generated_id' type='text/javascript'>subscribe_to_async_load('generated_id')</script>"
+      view_helper.async_load(BlankLoader).should eq "<span id='generated_id' class='kent-container' style='display:none;'></span>"
     end
 
     it "should register async loading" do

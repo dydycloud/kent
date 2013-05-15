@@ -1,3 +1,5 @@
+require File.join(GEM_ROOT, "spec", "support", "loaders", "test_loader.rb")
+
 class DeepLoaderBlank < TestLoader
 end
 
