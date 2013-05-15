@@ -5,4 +5,4 @@ gemspec
 
 gem 'json', '~> 1.7.7'
 gem 'render_anywhere'
-gem 'coveralls', require: false
+gem 'coveralls', :require => false

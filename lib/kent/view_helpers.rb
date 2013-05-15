@@ -1,6 +1,17 @@
 module Kent
   module ViewHelpers
 
+    # Main view helper
+    #
+    # @param loader [Kent::Loader]
+    # @param options [Hash]
+    # @yield block for evaluating
+    #
+    # Example:
+    #
+    # <%= async_load MySuperLoader, class: "my_class", style: { display: "block", color: "red" }
+    #   => "<span id='1fcaf530-9fb5-0130-3c4c-102b34ab9b1a' class='my_class kent-container' style='display:block; color:red;'></span>"
+    #
     def async_load(loader, options = {}, &block)
       options.symbolize_keys!
 
