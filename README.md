@@ -1,6 +1,12 @@
 # Kent
 
-TODO: Write a gem description
+Gem for asynchronous content loading.
+
+[![Build Status](https://travis-ci.org/iliabylich/kent.png?branch=master)](https://travis-ci.org/iliabylich/kent)
+[![Code Climate](https://codeclimate.com/github/iliabylich/kent.png)](https://codeclimate.com/github/iliabylich/kent)
+[![Coverage Status](https://coveralls.io/repos/iliabylich/kent/badge.png?branch=master)](https://coveralls.io/r/iliabylich/kent?branch=master)
+[![Gem Version](https://badge.fury.io/rb/kent.png)](https://rubygems.org/gems/kent)
+[![Dependency Status](https://gemnasium.com/iliabylich/kent.png)](https://gemnasium.com/iliabylich/kent)
 
 ## Installation
 
@@ -18,7 +24,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+[Here](http://iliabylich.github.io/kent/)
 
 ## Contributing
 
