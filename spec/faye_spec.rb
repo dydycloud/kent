@@ -22,9 +22,20 @@ describe Kent::Faye do
     k.uri.should eq URI.parse("http://example.com:123/faye")
   end
 
+  it "should build messge" do
+    k = Kent::Faye.new
+    expected = { :channel => "my_channel", :data => "my_message" }
+    k.build_message("my_channel", "my_message").should eq expected
+  end
+
+  let(:uri) { stub(:URI) }
+  let(:json) { stub(:JSON) }
+  let(:message) { stub(:Message, :to_json => json) }
+
   it "should send post request to uri" do
     k = Kent::Faye.new(:host => "example.com", :port => "123")
-    expected_params = [URI.parse("http://example.com:123/faye"), { :message => "{\"channel\":\"/channel\",\"data\":{\"key\":123}}" }]
+    k.stub(:uri => uri, :build_message => message)
+    expected_params = [uri, {:message => json}]
     Net::HTTP.should_receive(:post_form).with(*expected_params)
     k.publish("/channel", :key => 123)
   end

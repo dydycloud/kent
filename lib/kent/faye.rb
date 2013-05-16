@@ -60,11 +60,14 @@ module Kent
     # @param body [Hash, String, Fixnum] body that respond to 'to_json' method
     #
     def publish(channel, body)
-      message = {
+      Net::HTTP.post_form(uri, :message => build_message(channel, body).to_json)
+    end
+
+    def build_message(channel, body)
+      {
         :channel => channel,
         :data => body
       }
-      Net::HTTP.post_form(uri, :message => message.to_json)
     end
 
   end
