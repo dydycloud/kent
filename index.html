@@ -57,7 +57,120 @@
 
 <h2>Usage</h2>
 
-<p>TODO: Write usage instructions here</p>
+<p>First, we need a <a href="http://faye.jcoglan.com/">Faye</a> server and <a href="https://github.com/resque/resque/tree/1-x-stable">Resque</a> (for background procesing).</p>
+
+<pre><code>gem 'faye'
+gem 'thin'
+gem 'resque'</code>
+</pre>
+
+<hr>
+
+<p><b>1. Faye</b></p>
+
+<p>Here is basic example of Faye server (put it to ./faye.ru):</p>
+
+<div class="highlight"><pre><span class="nb">require</span> <span class="s1">'faye'</span><br><span class="ss">Faye</span><span class="p">:</span><span class="ss">:WebSocket</span><span class="o">.</span><span class="n">load_adapter</span><span class="p">(</span><span class="s1">'thin'</span><span class="p">)</span><br><br><span class="n">app</span> <span class="o">=</span> <span class="ss">Faye</span><span class="p">:</span><span class="ss">:RackAdapter</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:mount</span> <span class="o">=&gt;</span> <span class="s1">'/faye'</span><span class="p">,</span> <span class="ss">:timeout</span> <span class="o">=&gt;</span> <span class="mi">25</span><span class="p">)</span><br><br><span class="n">run</span> <span class="n">app</span><br></pre></div>
+
+<p>Make sure that faye server is working, visit <a href="http://localhost:9292/faye.js">this url</a>. If you can see a ton of javascript code, then everything is ok.</p>
+
+<hr>
+
+<p><b>2. Resque</b></p>
+
+<p>Run Resque worker:</p>
+
+<pre><code>VERBOSE=1 QUEUE=* rake resque:work</code></pre>
+
+<p>Note, that it's just an quick example of running Resque, don't run workers for all queues on production.</p>
+
+<hr>
+
+<p><b>3. It's time to generate!</b></p>
+
+<p>Run generator:</p>
+
+<pre><code>rails generate kent:install</code></pre>
+
+<p>In file <code>config/initializers/kent.rb</code> you should see this:</p>
+
+<div class="highlight"><pre><span class="no">Kent</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span><br><br>  <span class="c1"># Class for id generation, should respond to 'generate' method.</span><br>  <span class="c1">#</span><br>  <span class="n">config</span><span class="o">.</span><span class="n">id_generator</span> <span class="o">=</span> <span class="no">UUID</span><br><br>  <span class="c1"># Redis instance.</span><br>  <span class="c1">#</span><br>  <span class="n">config</span><span class="o">.</span><span class="n">redis</span> <span class="o">=</span> <span class="no">Redis</span><span class="o">.</span><span class="n">new</span><br><br>  <span class="c1"># Resque queue.</span><br>  <span class="c1">#</span><br>  <span class="n">config</span><span class="o">.</span><span class="n">resque_queue</span> <span class="o">=</span> <span class="ss">:kent_queue</span><br><br>  <span class="c1"># Faye host.</span><br>  <span class="c1">#</span><br>  <span class="n">config</span><span class="o">.</span><span class="n">faye_host</span> <span class="o">=</span> <span class="s2">"localhost"</span><br><br>  <span class="c1"># Faye port</span><br>  <span class="c1">#</span><br>  <span class="n">config</span><span class="o">.</span><span class="n">faye_port</span> <span class="o">=</span> <span class="mi">9292</span><br><br><span class="k">end</span><br></pre></div>
+
+<p>And just for testing and understanding main principles run scaffold generator:</p>
+
+<pre><code>rails generate scaffold Profile name about:text</code></pre>
+
+<p>It's a default configuration and it will be enough for now.</p>
+
+<p><b>4. Use Javascript</b></p>
+
+<p>Put this line in your <code>application.js</code> after <code>//= require jquery</code></p>
+
+<pre><code>//= require kent</code></pre>
+
+<p><b>5. Create loader</b></p>
+
+<p>You can create classes inherited from <code>Kent::Loader</code> (let's call it loaders). Each loader can load (and render) only one template. It also has before render hooks. Less words, more action!</p>
+
+<p>Let's create file <code>app/loaders/profiles/ll.rb</code>. Put this to your file:</p>
+
+<div class="highlight"><pre><span class="k">module</span> <span class="nn">Profiles</span><br>  <span class="k">class</span> <span class="nc">All</span> <span class="o">&lt;</span> <span class="ss">Kent</span><span class="p">:</span><span class="ss">:Loader</span><br>    <span class="n">template</span> <span class="p">{</span> <span class="s2">"profiles/all"</span> <span class="p">}</span><br>    <span class="n">before_render</span> <span class="p">{</span> <span class="vi">@profiles</span> <span class="o">=</span> <span class="no">Profile</span><span class="o">.</span><span class="n">all</span> <span class="p">}</span><br>  <span class="k">end</span><br><span class="k">end</span><br></pre></div>
+
+<p><code>template</code> field used for choosing which template should be rendered and loaded. <code>before_render</code> takes a block and store for call in future. Loaders can have several <code>before_render</code> callbacks (or no callbacks at all).</p>
+
+<p><code>before_render</code> callbacks are inherited field. This means that you can create abstract <code>UserLoader</code> and add a before_render hook for fetching user, <code>UserAwareLoader</code> for authorization and inherit from them.</p>
+
+<p><b>6. Use helpers</b></p>
+
+<p>Let's move part of created <code>app/views/profiles/index.html.erb</code> to separated file.</p>
+
+<p>Here is what's left:</p>
+
+<div class="highlight"><pre><span class="x">&lt;h1&gt;Listing profiles&lt;/h1&gt;</span><br><br><span class="cp">&lt;%=</span> <span class="n">render</span> <span class="ss">template</span><span class="p">:</span> <span class="s1">'all'</span> <span class="cp">%&gt;</span><span class="x"></span><br><br><span class="x">&lt;br /&gt;</span><br><br><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'New Profile'</span><span class="p">,</span> <span class="n">new_profile_path</span> <span class="cp">%&gt;</span><span class="x"></span><br></pre></div>
+
+<p>And here is <code>app/views/profiles/all.html.erb</code>:</p>
+
+<div class="highlight"><pre><span class="x">&lt;table&gt;</span><br><span class="x">  &lt;tr&gt;</span><br><span class="x">    &lt;th&gt;Name&lt;/th&gt;</span><br><span class="x">    &lt;th&gt;About&lt;/th&gt;</span><br><span class="x">    &lt;th&gt;&lt;/th&gt;</span><br><span class="x">    &lt;th&gt;&lt;/th&gt;</span><br><span class="x">    &lt;th&gt;&lt;/th&gt;</span><br><span class="x">  &lt;/tr&gt;</span><br><br><span class="cp">&lt;%</span> <span class="vi">@profiles</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">profile</span><span class="o">|</span> <span class="cp">%&gt;</span><span class="x"></span><br><span class="x">  &lt;tr&gt;</span><br><span class="x">    &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">profile</span><span class="o">.</span><span class="n">name</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span><br><span class="x">    &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">profile</span><span class="o">.</span><span class="n">about</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span><br><span class="x">    &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'Show'</span><span class="p">,</span> <span class="n">profile</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span><br><span class="x">    &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'Edit'</span><span class="p">,</span> <span class="n">edit_profile_path</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span><br><span class="x">    &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'Destroy'</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:delete</span><span class="p">,</span> <span class="ss">data</span><span class="p">:</span> <span class="p">{</span> <span class="ss">confirm</span><span class="p">:</span> <span class="s1">'Are you sure?'</span> <span class="p">}</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span><br><span class="x">  &lt;/tr&gt;</span><br><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span><br><span class="x">&lt;/table&gt;</span><br></pre></div>
+
+<p>Let's change <code>render</code> to Kent helper:</p>
+
+<div class="highlight"><pre><span class="x">&lt;h1&gt;Listing profiles&lt;/h1&gt;</span><br><br><span class="cp">&lt;%=</span> <span class="n">render</span> <span class="ss">template</span><span class="p">:</span> <span class="s1">'all'</span> <span class="cp">%&gt;</span><span class="x"></span><br><br><span class="cp">&lt;%=</span> <span class="n">async_load</span> <span class="ss">Profiles</span><span class="p">:</span><span class="ss">:All</span> <span class="cp">%&gt;</span><span class="x"></span><br><br><span class="x">&lt;br /&gt;</span><br><br><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'New Profile'</span><span class="p">,</span> <span class="n">new_profile_path</span> <span class="cp">%&gt;</span><span class="x"></span><br></pre></div>
+
+<p>Reload you page. You should see that for a second the page hasn't our table, but then it appears. Here that such Kent</p>
+
+<p><b>6. Customization</b></p>
+
+<p>You can pass extra options to <code>async_load</code> method:</p>
+
+<ul id="customization">
+  <li>You can pass a block that will be displayed until template loaded (Let's call it initial template).</li>
+  <li>You can pass <code>:class</code> that will be a css class of initial template.</li>
+  <li>You can pass <code>:subscription_id</code> (and add callbacks, we'll return to this later).</li>
+  <li>You can pass <code>:style</code> of initial template (as a hash)</li>
+</ul>
+
+<p>Here is an example:</p>
+
+<div class="highlight"><pre><span class="cp">&lt;%=</span> <span class="n">async_load</span> <span class="ss">Profiles</span><span class="p">:</span><span class="ss">:All</span><span class="p">,</span> <span class="ss">class</span><span class="p">:</span> <span class="s2">"my_class"</span><span class="p">,</span> <span class="n">subscription_id</span><span class="p">:</span> <span class="s2">"asd"</span><span class="p">,</span> <span class="ss">style</span><span class="p">:</span> <span class="p">{</span> <span class="ss">asd</span><span class="p">:</span> <span class="s2">"qwe"</span> <span class="p">}</span> <span class="cp">%&gt;</span><span class="x"></span><br><span class="x">  &lt;b&gt;WAIT!!&lt;/b&gt;</span><br><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span><br></pre></div>
+
+<p><b>8. Client-side</b></p>
+
+<p>We have a <code>kent.js</code> in our manifest, let's use it!</p>
+
+<p>You have 2 types of callbacks:</p>
+
+<ul>
+  <li><code>$.fn.kentReady(callback)</code> - fires when content is loaded (fires for each loader)</li>
+  <li><code>Kent.subscribe(subscriptionId, callback(content))</code> - fires when some event was passed with <code>subscriptionId</code> (<a href="#customization">remember?</a>)</li>
+</ul>
+
+<a href="https://github.com/iliabylich/kent-demo/blob/master/app/assets/javascripts/application.js">Usage</a>
+
+<hr>
+
+<p><b>9. Demo application</b></p>
+
+<p>You can clone and check it from <a href="https://github.com/iliabylich/kent-demo">this repo</a></p>
 
 <h2>Contributing</h2>
 
