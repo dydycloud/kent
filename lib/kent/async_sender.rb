@@ -25,17 +25,17 @@ module Kent
     # @param loader_name [String] name of loader
     # @param generated_id [String]
     #
-    def self.perform(loader_name, generated_id)
+    def self.perform(loader_name, generated_id, params)
       loader = loader_name.constantize
-      sender.publish("/#{generated_id}", template(loader))
+      sender.publish("/#{generated_id}", template(loader, params))
     end
 
     # Returns template from loader
     #
     # @param loader [Kent::Loader]
     #
-    def self.template(loader)
-      loader.new.render_template
+    def self.template(loader, params)
+      loader.new(params).render_template
     end
 
     # Returns class for communication with client

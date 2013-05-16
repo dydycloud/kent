@@ -39,30 +39,41 @@ module Kent
     # Method that runs before_render hooks
     #
     def run_before_render_hooks
-      if @need_to_run_hooks
-        self.class.before_render_procs.each do |p|
-          rendering_controller.instance_eval(&p)
-        end
-        @need_to_run_hooks = false
+      return unless @need_to_run_hooks
+      self.class.before_render_procs.each do |p|
+        rendering_controller.instance_eval(&p)
       end
+      @need_to_run_hooks = false
     end
 
+    # Method for template rendering.
+    # Can work from any place.
+    #
     def render_template
       run_before_render_hooks
       render :template => template_path, :layout => false
     end
 
+    # Returns path to template.
+    #
     def template_path
       self.class.template_path
     end
 
-    # def render(*args)
-    #   rendering_controller.render_to_string(*args)
-    # end
+    # Method that renders template.
+    #
+    def render(*args)
+      rendering_controller.render_to_string(*args)
+    end
 
-    # def rendering_controller
-    #   @rendering_controller ||= RenderAnywhere::RenderingController.new
-    # end
+    # Returns controller that will render template.
+    #
+    def rendering_controller
+      @rendering_controller ||= RenderAnywhere::RenderingController.new.tap do |r|
+        (class << r; self; end).send(:attr_accessor, :params)
+        r.params = @params.symbolize_keys
+      end
+    end
 
     class << self
       include Loaders::Template
@@ -78,5 +89,4 @@ ActiveSupport.on_load(:before_configuration) do
     end
   end
   require "render_anywhere"
-  Kent::Loader.send(:include, RenderAnywhere)
 end

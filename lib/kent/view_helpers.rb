@@ -26,7 +26,7 @@ module Kent
     end
 
     def register_async_loading(loader, subscription_id)
-      ::Resque.enqueue(kent_worker, loader.name, subscription_id)
+      ::Resque.enqueue(kent_worker, loader.name, subscription_id, params)
     end
 
     def kent_worker
