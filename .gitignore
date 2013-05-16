@@ -1,0 +1,4 @@
+.rspec
+.rvmrc
+Gemfile.lock
+coverage/
