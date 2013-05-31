@@ -78,11 +78,15 @@ gem 'resque'</code>
 
 <p><b>2. Resque</b></p>
 
+<p>Add a default rake task</p>
+
+<pre><code>task "resque:setup" => :environment</code></pre>
+
 <p>Run Resque worker:</p>
 
 <pre><code>VERBOSE=1 QUEUE=* rake resque:work</code></pre>
 
-<p>Note, that it's just an quick example of running Resque, don't run workers for all queues on production.</p>
+<p>Note, that it's just a quick example of running Resque, don't run workers for all queues on production.</p>
 
 <hr>
 
@@ -161,7 +165,7 @@ gem 'resque'</code>
 
 <ul>
   <li><code>$.fn.kentReady(callback)</code> - fires when content is loaded (fires for each loader)</li>
-  <li><code>Kent.subscribe(subscriptionId, callback(content))</code> - fires when some event was passed with <code>subscriptionId</code> (<a href="#customization">remember?</a>)</li>
+  <li><code>Kent.subscribe(subscriptionId, callback(content))</code> - fires when container with specified <code>subscriptionId</code> was loaded. (<a href="#customization">remember?</a>)</li>
 </ul>
 
 <a href="https://github.com/iliabylich/kent-demo/blob/master/app/assets/javascripts/application.js">Usage</a>
