@@ -1,92 +1,107 @@
-require 'kent/loaders/template'
-require 'kent/loaders/hooks'
-
-# Main logical class
+#
+# Main logical class.
+# You should inherit from this class
+# if you want to make your own loader.
+#
+# You can configure 2 main values:
+#
+#   - template
+#   - before render procs
+#
+# Template is a path (from "app/views") to your template
+# Before render procs is an Array or procs that will be evaluated before rendering (in context of render object)
 #
 # Usage (example):
 #
-# class MyLoader < Kent::Loader
-#   ## DSL for passing data to view context
-#   before_render do
-#     ## All instance variables will be visible in template
-#     @a = 1
+#   class MyLoader < Kent::Loader
+#
+#     before_render do
+#       # All instance variables are visible in template
+#       @a = 1
+#     end
+#
+#     template do
+#       # Template should be in "app/views"
+#       "profiles/all"
+#     end
 #   end
 #
-#   ## DSL for configuring template for rendering
-#   template do
-#     "profiles/all"
-#   end
-# end
-#
-# app/views/profiles/all.html.erb:
-# a = <%= @a %>
+#   # app/views/profiles/all.html.erb:
+#   <h1>a = <%= @a %></h1>
 #
 #
-# MyLoader.new.render_template
-#   => "a = 1"
+#   MyLoader.new.render_template
+#     => "<h1>a = 1</h1>"
 #
 
-module Kent
-  class Loader
-    attr_reader :params
-    attr_reader :need_to_run_hooks
+class Kent::Loader
 
-    def initialize(params = {})
-      @params = params
-      @need_to_run_hooks = true
-    end
+  # Stores request parameters
+  #
+  # @return [Hash]
+  #
+  attr_reader :params
 
-    # Method that runs before_render hooks
-    #
-    def run_before_render_hooks
-      return unless @need_to_run_hooks
-      self.class.before_render_procs.each do |p|
-        rendering_controller.instance_eval(&p)
-      end
-      @need_to_run_hooks = false
-    end
+  # Bool flag (internal)
+  #
+  attr_reader :need_to_run_hooks
 
-    # Method for template rendering.
-    # Can work from any place.
-    #
-    def render_template
-      run_before_render_hooks
-      render :template => template_path, :layout => false
-    end
-
-    # Returns path to template.
-    #
-    def template_path
-      self.class.template_path
-    end
-
-    # Method that renders template.
-    #
-    def render(*args)
-      rendering_controller.render_to_string(*args)
-    end
-
-    # Returns controller that will render template.
-    #
-    def rendering_controller
-      @rendering_controller ||= RenderAnywhere::RenderingController.new.tap do |r|
-        (class << r; self; end).send(:attr_accessor, :params)
-        r.params = @params.symbolize_keys
-      end
-    end
-
-    class << self
-      include Loaders::Template
-      include Loaders::Hooks
-    end
-
+  # Initialize method
+  #
+  # @param params [Hash] request parameters
+  #
+  def initialize(params = {})
+    @params = params
+    @need_to_run_hooks = true
   end
-end
 
-ActiveSupport.on_load(:before_configuration) do
-  unless defined? ApplicationHelper
-    module ApplicationHelper
+  # Method for running before render hooks
+  #
+  def run_before_render_hooks
+    return unless @need_to_run_hooks
+    self.class.before_render_procs.each do |p|
+      rendering_controller.instance_eval(&p)
+    end
+    @need_to_run_hooks = false
+  end
+
+  # Method for template rendering.
+  #
+  # Can work from any place (even from background)
+  #
+  def render_template
+    run_before_render_hooks
+    render :template => template_path, :layout => false
+  end
+
+  # Returns path to template.
+  #
+  # @see Kent::Loaders::Template
+  #
+  def template_path
+    self.class.template_path
+  end
+
+  # Method that renders template.
+  #
+  # @see RenderAnywhere
+  #
+  def render(*args)
+    rendering_controller.render_to_string(*args)
+  end
+
+  # Returns controller that will render template.
+  #
+  def rendering_controller
+    @rendering_controller ||= RenderAnywhere::RenderingController.new.tap do |r|
+      (class << r; self; end).send(:attr_accessor, :params)
+      r.params = @params.symbolize_keys
     end
   end
-  require "render_anywhere"
+
+  require 'kent/loaders/hooks'
+  require 'kent/loaders/template'
+  extend Hooks
+  extend Template
+
 end

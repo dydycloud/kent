@@ -1,26 +1,37 @@
-module Loaders
-  module Template
-    def template
-      @template_path = yield
-    end
+#
+# Module for defining base accessors for storing a path to template
+#
+module Kent::Loader::Template
 
-    def template_path
-      return "" if self == ::Kent::Loader
-      @template_path ||= inherited_template_path
-    end
-
-    protected
-
-    def loader_ancestors
-      self.ancestors.take_while { |a| a != ::Kent::Loader }.select{ |klass| klass != self }
-    end
-
-    def first_ancestor_with_template_path
-      loader_ancestors.detect { |klass| klass.template_path }
-    end
-
-    def inherited_template_path
-      first_ancestor_with_template_path.nil? ? "" : first_ancestor_with_template_path.template_path
-    end
+  # @private
+  #
+  def inherited(klass)
+    klass.template_path = self.template_path
+    super
   end
+
+  attr_accessor :template_path
+
+  # Returns path to template
+  #
+  # @return [String] path to template
+  #
+  # @see #template
+  #
+  def template_path
+    @template_path ||= ""
+  end
+
+  # Method for setting a path to template
+  #
+  # @example
+  #   template { "path/to/template" }
+  #
+  # @yield
+  # @see #template_path
+  #
+  def template
+    @template_path = yield
+  end
+
 end

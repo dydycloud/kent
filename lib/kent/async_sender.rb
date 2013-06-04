@@ -2,45 +2,57 @@ require 'net/http'
 
 # Base Kent worker.
 #
-# Usage:
+# @example Basic usage:
+#   Resque.enqueue(Kent::AsyncSender, "Some::Loader", "some-uniq-id")
 #
-# Resque.enqueue(Kent::AsyncSender, "Some::Loader", "some-uniq-id")
+# @example You can pass extra data as last argument (should be serializable):
+#   Resque.enqueue(Kent::AsyncSender, "My::Another::Loader", "some-uniq-id", :extra => "parameters")
 #
 # This worker can render template and send it to client
 #
+class Kent::AsyncSender
+  class << self
 
-module Kent
-  class AsyncSender
+    attr_accessor :queue
 
-    class << self
-      attr_accessor :queue
-
-      def queue
-        @queue ||= Kent.resque_queue
-      end
+    # Returns name of queue (in Resque).
+    # Default value: Kent.resque_queue
+    #
+    # @return [String]
+    #
+    def queue
+      @queue ||= Kent.resque_queue
     end
 
     # Base perform method
     #
     # @param loader_name [String] name of loader
-    # @param generated_id [String]
+    # @param generated_id [String] id of subscription
+    # @param params [Hash] hash of params (params - in terms of view/controller)
     #
-    def self.perform(loader_name, generated_id, params)
+    def perform(loader_name, generated_id, params = {})
       loader = loader_name.constantize
       sender.publish("/#{generated_id}", template(loader, params))
     end
 
-    # Returns template from loader
+    # Returns rendered template (from loader)
     #
-    # @param loader [Kent::Loader]
+    # @param loader [Kent::Loader] loader
+    # @param params [Hash] hash of params (params - in terms of view/controller)
     #
-    def self.template(loader, params)
+    def template(loader, params = {})
       loader.new(params).render_template
     end
 
     # Returns class for communication with client
     #
-    def self.sender
+    # Can be overriden in subclasses
+    #
+    # @return [Kent::Faye] (Kent::Faye)
+    #
+    # @see Kent::Faye
+    #
+    def sender
       Kent::Faye.new
     end
 

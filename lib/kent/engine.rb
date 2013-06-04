@@ -1,4 +1,4 @@
-module Kent
-  class Engine < Rails::Engine
-  end
+# Blank Rails engine for assets
+#
+class Kent::Engine < Rails::Engine
 end

@@ -6,7 +6,7 @@ end
 class DeepLoaderWithRenderOverride < TestLoader
 
   before_render do
-    self.class.instance_eval { attr_accessor :deep_field }
+    self.class.send(:attr_accessor, :deep_field)
     self.deep_field = :deep_loader
   end
 
@@ -23,7 +23,7 @@ end
 class VeryDeepLoader < DeepLoaderWithRenderOverride
 
   before_render do
-    self.class.instance_eval { attr_accessor :very_deep_field }
+    self.class.send(:attr_accessor, :very_deep_field)
     self.very_deep_field = :very_deep_field
   end
 

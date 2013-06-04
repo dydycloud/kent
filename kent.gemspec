@@ -1,11 +1,10 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'kent/version'
 
 Gem::Specification.new do |gem|
   gem.name          = "kent"
-  gem.version       = Kent::VERSION
+  gem.version       = "1.0.0"
   gem.authors       = ["Ilya Bylich"]
   gem.email         = ["ilya.bylich@productmadness.com"]
   gem.description   = %q{description}
@@ -22,6 +21,8 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "simplecov"
   gem.add_development_dependency "rails"
   gem.add_development_dependency "resque"
+  gem.add_development_dependency "yard"
+  gem.add_development_dependency "redcarpet"
   gem.add_runtime_dependency "render_anywhere"
   gem.add_runtime_dependency "uuid"
   gem.add_runtime_dependency "redis"
