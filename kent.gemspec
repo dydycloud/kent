@@ -4,9 +4,9 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
   gem.name          = "kent"
-  gem.version       = "1.0.0"
+  gem.version       = "1.0.1"
   gem.authors       = ["Ilya Bylich"]
-  gem.email         = ["ilya.bylich@productmadness.com"]
+  gem.email         = ["ibylich@gmail.com"]
   gem.description   = %q{description}
   gem.summary       = %q{sumary}
   gem.homepage      = ""
