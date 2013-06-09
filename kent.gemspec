@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rails"
   gem.add_development_dependency "resque"
   gem.add_development_dependency "yard"
-  gem.add_development_dependency "redcarpet"
+  gem.add_development_dependency "redcarpet" if RUBY_PLATFORM != "java"
   gem.add_runtime_dependency "render_anywhere"
   gem.add_runtime_dependency "uuid"
   gem.add_runtime_dependency "redis"
